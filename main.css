@@ -7,3 +7,8 @@
 .dot {
   fill: #2B303A;
 }
+
+.selectionRectangle {
+  fill: black;
+  opacity: 0.5;
+}

@@ -41,38 +41,30 @@ class Chart {
   plot(){
     var self = this;
 
-    // Set the ranges
     var x = d3.scaleTime().range([0, this.options.width]);
     var y = d3.scaleLinear().range([this.options.height, 0]);
 
     var minY = d3.min(this.data, function(d){ return d.value; });
     var maxY = d3.max(this.data, function(d) { return d.value; });
 
-    minY *= 1.1;
-    maxY *= 1.1;
+    // Scales y axis such that min value isn't placed right on the x axis
+    minY -= (maxY - minY) * 0.05;
+    maxY += (maxY - minY) * 0.05;
 
-    // Define the axes
     var xAxis = d3.axisBottom().scale(x).ticks(10);
-
     var yAxis = d3.axisLeft().scale(y).ticks(10);
 
-    // Define the line
     var valueline = d3.line()
       .x(function(d) { return x(d.date); })
       .y(function(d) { return y(d.value); });
 
-    // Scale the range of the data
     x.domain(d3.extent(this.data, function(d) { return d.date; }));
     y.domain([minY, maxY]);
 
-    // Add the valueline path.
     this.svg.append("path")
       .attr("class", "line")
       .attr("d", valueline(this.data));
-        //.attr('stroke-width', 2)
-        //.attr('stroke', 'black');
 
-    // Add the scatterplot
     this.svg.selectAll(".dot")
         .data(this.data)
       .enter().append("circle")
@@ -82,6 +74,7 @@ class Chart {
         .attr("cx", function(d) { return x(d.date); })
         .attr("cy", function(d) { return y(d.value); });
 
+    // This allows users to not directly hit the dot for it to be selected
     this.svg.selectAll(".dotMouse")
         .data(this.data)
       .enter().append("circle")
@@ -93,13 +86,11 @@ class Chart {
         .on("mouseover", this.handleMouseOver())
         .on("mouseout", this.handleMouseOut());
 
-    // Add the X Axis
     this.svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + this.options.height + ")")
       .call(xAxis);
 
-    // Add the Y Axis
     this.svg.append("g")
       .attr("class", "y axis")
       .call(yAxis);
@@ -126,25 +117,23 @@ class Chart {
       });
 
       self.svg.append('rect')
-          .attr('class', 'leftRectangle')
+          .attr('class', 'selectionRectangle')
           .attr('x', 0)
           .attr('y', -self.options.dotRadius)
-          .attr('width', Math.max(self.svg  .select("#" + self.getIdFor(week[0])).attr('cx') - self.options.dotRadius, 0))
-          .attr('height', self.options.height + self.options.dotRadius)
-          .attr('fill', 'black')
-          .attr('opacity', 0)
-          .attr('opacity', 0.5);
+          .attr('width', Math.max(self.getIntAttrFor(week[0], 'cx') - self.options.dotRadius, 0)) // Width can't be negative
+          .attr('height', self.options.height + self.options.dotRadius);
 
       self.svg.append('rect')
-          .attr('class', 'rightRectangle')
-          .attr('x', parseInt(self.svg.select("#" + self.getIdFor(week[week.length-1])).attr('cx')) + self.options.dotRadius)
+          .attr('class', 'selectionRectangle')
+          .attr('x', self.getIntAttrFor(week[week.length-1], 'cx') + self.options.dotRadius)
           .attr('y', -self.options.dotRadius)
-          .attr('width', self.options.width - self.svg.select("#" + self.getIdFor(week[week.length-1])).attr('cx'))
-          .attr('height', self.options.height + self.options.dotRadius)
-          .attr('fill', 'black')
-          .attr('opacity', 0)
-          .attr('opacity', 0.5);
+          .attr('width', self.options.width - self.getIntAttrFor(week[week.length-1], 'cx'))
+          .attr('height', self.options.height + self.options.dotRadius);
     }
+  }
+
+  getIntAttrFor(day, attr){
+    return parseInt(this.svg.select("#" + this.getIdFor(day)).attr(attr));
   }
 
   getExtremums(data, type){
@@ -189,8 +178,7 @@ class Chart {
       .style('fill', self.options.defaultDotFill)
       .attr("r", self.options.dotRadius);
 
-    self.svg.selectAll('.leftRectangle').remove();
-    self.svg.selectAll('.rightRectangle').remove();
+    self.svg.selectAll('.selectionRectangle').remove();
   }
 
   getWeekFor(d){
@@ -205,7 +193,6 @@ class Chart {
 
     return week;
   }
-
 
   sameWeek(d1, d2){
     return moment(d1).format('W') == moment(d2).format('W');
