@@ -1,5 +1,9 @@
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: #001F54;
   stroke-width: 2px;
+}
+
+.dot {
+  fill: #2B303A;
 }
