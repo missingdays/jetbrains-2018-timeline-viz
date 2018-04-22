@@ -10,9 +10,9 @@ DEFAULT_OPTIONS = {
 
   dotRadius: 3,
   dotBigRadius: 4,
-  defaultDotFill: "#2B303A",
-  maxDotFill: "#BF211E",
-  minDotFill: "#92DCE5"
+  defaultDotFill: '#2B303A',
+  maxDotFill: '#BF211E',
+  minDotFill: '#92DCE5'
 }
 
 class Chart {
@@ -28,13 +28,13 @@ class Chart {
   }
 
   initSvg(){
-    this.svg = d3.select("#container")
-      .append("svg")
-        .attr("width", this.options.width + this.options.marginLeft + this.options.marginRight)
-        .attr("height", this.options.height + this.options.marginTop + this.options.marginBottom)
-        .attr("id", "#" + this.name)
-      .append("g")
-        .attr("transform", "translate(" + this.options.marginLeft + "," + this.options.marginTop + ")");
+    this.svg = d3.select('#container')
+      .append('svg')
+        .attr('width', this.options.width + this.options.marginLeft + this.options.marginRight)
+        .attr('height', this.options.height + this.options.marginTop + this.options.marginBottom)
+        .attr('id', '#' + this.name)
+      .append('g')
+        .attr('transform', `translate(${this.options.marginLeft}, ${this.options.marginTop})`);
   }
 
 
@@ -61,38 +61,38 @@ class Chart {
     x.domain(d3.extent(this.data, function(d) { return d.date; }));
     y.domain([minY, maxY]);
 
-    this.svg.append("path")
-      .attr("class", "line")
-      .attr("d", valueline(this.data));
+    this.svg.append('path')
+      .attr('class', 'line')
+      .attr('d', valueline(this.data));
 
-    this.svg.selectAll(".dot")
+    this.svg.selectAll('.dot')
         .data(this.data)
-      .enter().append("circle")
-        .attr("class", "dot")
-        .attr("id", function(d, i){ return self.getIdFor(d); })
-        .attr("r", this.options.dotRadius)
-        .attr("cx", function(d) { return x(d.date); })
-        .attr("cy", function(d) { return y(d.value); });
+      .enter().append('circle')
+        .attr('class', 'dot')
+        .attr('id', function(d, i){ return self.getIdFor(d); })
+        .attr('r', this.options.dotRadius)
+        .attr('cx', function(d) { return x(d.date); })
+        .attr('cy', function(d) { return y(d.value); });
 
     // This allows users to not directly hit the dot for it to be selected
-    this.svg.selectAll(".dotMouse")
+    this.svg.selectAll('.dotMouse')
         .data(this.data)
-      .enter().append("circle")
-        .attr("class", "dotMouse")
-        .attr("r", this.options.dotRadius * 2)
-        .attr("opacity", 0)
-        .attr("cx", function(d) { return x(d.date); })
-        .attr("cy", function(d) { return y(d.value); })
-        .on("mouseover", this.handleMouseOver())
-        .on("mouseout", this.handleMouseOut());
+      .enter().append('circle')
+        .attr('class', 'dotMouse')
+        .attr('r', this.options.dotRadius * 2)
+        .attr('opacity', 0)
+        .attr('cx', function(d) { return x(d.date); })
+        .attr('cy', function(d) { return y(d.value); })
+        .on('mouseover', this.handleMouseOver())
+        .on('mouseout', this.handleMouseOut());
 
-    this.svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + this.options.height + ")")
+    this.svg.append('g')
+      .attr('class', 'x axis')
+      .attr('transform', `translate(0, ${this.options.height})`)
       .call(xAxis);
 
-    this.svg.append("g")
-      .attr("class", "y axis")
+    this.svg.append('g')
+      .attr('class', 'y axis')
       .call(yAxis);
   }
 
@@ -106,12 +106,12 @@ class Chart {
 
       week.forEach(function(day){
         if(mins.includes(day)){
-          self.svg.select("#" + self.getIdFor(day))
-            .attr("r", self.options.dotBigRadius)
+          self.svg.select('#' + self.getIdFor(day))
+            .attr('r', self.options.dotBigRadius)
             .style('fill', self.options.minDotFill);
         } else if(maxs.includes(day)){
-          self.svg.select("#" + self.getIdFor(day))
-            .attr("r", self.options.dotBigRadius)
+          self.svg.select('#' + self.getIdFor(day))
+            .attr('r', self.options.dotBigRadius)
             .style('fill', self.options.maxDotFill);
         }
       });
@@ -133,7 +133,7 @@ class Chart {
   }
 
   getIntAttrFor(day, attr){
-    return parseInt(this.svg.select("#" + this.getIdFor(day)).attr(attr));
+    return parseInt(this.svg.select('#' + this.getIdFor(day)).attr(attr));
   }
 
   getExtremums(data, type){
@@ -174,9 +174,9 @@ class Chart {
   clearSelection(){
     var self = this;
 
-    self.svg.selectAll(".dot")
+    self.svg.selectAll('.dot')
       .style('fill', self.options.defaultDotFill)
-      .attr("r", self.options.dotRadius);
+      .attr('r', self.options.dotRadius);
 
     self.svg.selectAll('.selectionRectangle').remove();
   }
@@ -199,6 +199,6 @@ class Chart {
   }
 
   getIdFor(day){
-    return "point" + self.name + day.date.toISOString().slice(0,10);
+    return 'point' + self.name + day.date.toISOString().slice(0,10);
   }
 }
