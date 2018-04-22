@@ -26,3 +26,8 @@ handcraftedChart.plot();
 
 var randomChart = new Chart('random', januaryData);
 randomChart.plot();
+
+setTimeout(function(){
+  randomChart.data = handcraftedData;
+  randomChart.plot();
+}, 5000)

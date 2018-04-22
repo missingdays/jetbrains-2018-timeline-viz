@@ -32,14 +32,15 @@ class Chart {
       .append('svg')
         .attr('width', this.options.width + this.options.marginLeft + this.options.marginRight)
         .attr('height', this.options.height + this.options.marginTop + this.options.marginBottom)
-        .attr('id', '#' + this.name)
-      .append('g')
-        .attr('transform', `translate(${this.options.marginLeft}, ${this.options.marginTop})`);
+        .attr('id', '#' + this.name);
   }
-
 
   plot(){
     var self = this;
+
+    this.svg.select('g').remove();
+    this.canvas = this.svg.append('g')
+        .attr('transform', `translate(${this.options.marginLeft}, ${this.options.marginTop})`)
 
     var x = d3.scaleTime().range([0, this.options.width]);
     var y = d3.scaleLinear().range([this.options.height, 0]);
@@ -61,11 +62,11 @@ class Chart {
     x.domain(d3.extent(this.data, function(d) { return d.date; }));
     y.domain([minY, maxY]);
 
-    this.svg.append('path')
+    this.canvas.append('path')
       .attr('class', 'line')
       .attr('d', valueline(this.data));
 
-    this.svg.selectAll('.dot')
+    this.canvas.selectAll('.dot')
         .data(this.data)
       .enter().append('circle')
         .attr('class', 'dot')
@@ -75,7 +76,7 @@ class Chart {
         .attr('cy', function(d) { return y(d.value); });
 
     // This allows users to not directly hit the dot for it to be selected
-    this.svg.selectAll('.dotMouse')
+    this.canvas.selectAll('.dotMouse')
         .data(this.data)
       .enter().append('circle')
         .attr('class', 'dotMouse')
@@ -86,12 +87,12 @@ class Chart {
         .on('mouseover', this.handleMouseOver())
         .on('mouseout', this.handleMouseOut());
 
-    this.svg.append('g')
+    this.canvas.append('g')
       .attr('class', 'x axis')
       .attr('transform', `translate(0, ${this.options.height})`)
       .call(xAxis);
 
-    this.svg.append('g')
+    this.canvas.append('g')
       .attr('class', 'y axis')
       .call(yAxis);
   }
@@ -106,24 +107,24 @@ class Chart {
 
       week.forEach(function(day){
         if(mins.includes(day)){
-          self.svg.select('#' + self.getIdFor(day))
+          self.canvas.select('#' + self.getIdFor(day))
             .attr('r', self.options.dotBigRadius)
             .style('fill', self.options.minDotFill);
         } else if(maxs.includes(day)){
-          self.svg.select('#' + self.getIdFor(day))
+          self.canvas.select('#' + self.getIdFor(day))
             .attr('r', self.options.dotBigRadius)
             .style('fill', self.options.maxDotFill);
         }
       });
 
-      self.svg.append('rect')
+      self.canvas.append('rect')
           .attr('class', 'selectionRectangle')
           .attr('x', 0)
           .attr('y', -self.options.dotRadius)
           .attr('width', Math.max(self.getIntAttrFor(week[0], 'cx') - self.options.dotRadius, 0)) // Width can't be negative
           .attr('height', self.options.height + self.options.dotRadius);
 
-      self.svg.append('rect')
+      self.canvas.append('rect')
           .attr('class', 'selectionRectangle')
           .attr('x', self.getIntAttrFor(week[week.length-1], 'cx') + self.options.dotRadius)
           .attr('y', -self.options.dotRadius)
@@ -133,7 +134,7 @@ class Chart {
   }
 
   getIntAttrFor(day, attr){
-    return parseInt(this.svg.select('#' + this.getIdFor(day)).attr(attr));
+    return parseInt(this.canvas.select('#' + this.getIdFor(day)).attr(attr));
   }
 
   getExtremums(data, type){
@@ -174,11 +175,11 @@ class Chart {
   clearSelection(){
     var self = this;
 
-    self.svg.selectAll('.dot')
+    self.canvas.selectAll('.dot')
       .style('fill', self.options.defaultDotFill)
       .attr('r', self.options.dotRadius);
 
-    self.svg.selectAll('.selectionRectangle').remove();
+    self.canvas.selectAll('.selectionRectangle').remove();
   }
 
   getWeekFor(d){
