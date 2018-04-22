@@ -52,7 +52,10 @@ class Chart {
     minY -= (maxY - minY) * 0.05;
     maxY += (maxY - minY) * 0.05;
 
-    var xAxis = d3.axisBottom().scale(x).ticks(10);
+    // Display every monday and the first day of the month. This way the month name is displayed.
+    var mondays = this.data.filter(day => day.date.getDay() == 1).map(day => day.date);
+    var xAxis = d3.axisBottom().scale(x).tickValues([this.data[0].date].concat(mondays));
+
     var yAxis = d3.axisLeft().scale(y).ticks(10);
 
     var valueline = d3.line()
@@ -121,12 +124,12 @@ class Chart {
           .attr('class', 'selectionRectangle')
           .attr('x', 0)
           .attr('y', -self.options.dotRadius)
-          .attr('width', Math.max(self.getIntAttrFor(week[0], 'cx') - self.options.dotRadius, 0)) // Width can't be negative
+          .attr('width', Math.max(self.getIntAttrFor(week[0], 'cx'), 0)) // Width can't be negative
           .attr('height', self.options.height + self.options.dotRadius);
 
       self.canvas.append('rect')
           .attr('class', 'selectionRectangle')
-          .attr('x', self.getIntAttrFor(week[week.length-1], 'cx') + self.options.dotRadius)
+          .attr('x', self.getIntAttrFor(week[week.length-1], 'cx'))
           .attr('y', -self.options.dotRadius)
           .attr('width', self.options.width - self.getIntAttrFor(week[week.length-1], 'cx'))
           .attr('height', self.options.height + self.options.dotRadius);
