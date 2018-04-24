@@ -12,7 +12,9 @@ const DEFAULT_OPTIONS = {
   dotBigRadius: 4,
   defaultDotFill: '#2B303A',
   maxDotFill: '#BF211E',
-  minDotFill: '#92DCE5'
+  minDotFill: '#92DCE5',
+
+  bindTo: '#container'
 }
 
 class Chart {
@@ -28,7 +30,7 @@ class Chart {
   }
 
   initSvg(){
-    this.svg = d3.select('#container')
+    this.svg = d3.select(this.options.bindTo)
       .append('svg')
         .attr('width', this.options.width + this.options.marginLeft + this.options.marginRight)
         .attr('height', this.options.height + this.options.marginTop + this.options.marginBottom)
